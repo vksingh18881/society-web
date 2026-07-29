@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Society | Members Information Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a5f7a;
+      --primary-dark: #0d3b4d;
+      --accent: #159895;
+      --light: #f8fafc;
+      --text: #1e293b;
+      --muted: #64748b;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; color: var(--text); background: var(--light); line-height: 1.6; scroll-behavior: smooth; }
+
+    /* NAVBAR */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 15px rgba(0,0,0,0.06); z-index: 1000; padding: 0 5%; height: 70px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 1.35rem; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .logo span { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-links { display: flex; gap: 22px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--text); font-weight: 500; font-size: 0.92rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+    .lang-switch { display: flex; background: #e2e8f0; border-radius: 50px; padding: 3px; font-size: 0.85rem; font-weight: 600; }
+    .lang-btn { border: none; background: transparent; padding: 6px 14px; border-radius: 50px; cursor: pointer; color: var(--muted); transition: all 0.2s; font-family: inherit; font-weight: 600; }
+    .lang-btn.active { background: var(--primary); color: white; }
+    .menu-toggle { display: none; background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--primary); }
+
+    /* HERO */
+    .hero { margin-top: 70px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); color: white; padding: 90px 5% 80px; text-align: center; }
+    .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; line-height: 1.25; }
+    .hero p { font-size: 1.1rem; max-width: 640px; margin: 0 auto 30px; opacity: 0.95; font-weight: 300; }
+    .hero-btn { display: inline-block; background: white; color: var(--primary); padding: 12px 32px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s; }
+    .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+    /* SECTIONS */
+    section { padding: 70px 5%; max-width: 1200px; margin: 0 auto; }
+    .section-title { text-align: center; margin-bottom: 45px; }
+    .section-title h2 { font-size: 1.85rem; color: var(--primary-dark); margin-bottom: 10px; }
+    .section-title p { color: var(--muted); max-width: 520px; margin: 0 auto; }
+
+    /* ABOUT */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .about-text h3 { font-size: 1.35rem; margin-bottom: 14px; color: var(--primary); }
+    .about-text p { color: var(--muted); margin-bottom: 12px; }
+    .about-card { background: var(--card-bg); padding: 28px; border-radius: var(--radius); box-shadow: var(--shadow); }
+    .about-card h3 { color: var(--primary); margin-bottom: 8px; }
+    .about-card ul { list-style: none; margin-top: 16px; }
+    .about-card li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
+    .about-card li:last-child { border-bottom: none; }
+    .about-card li::before { content: "✓"; color: var(--accent); font-weight: 700; }
+
+    /* EMERGENCY CONTACTS */
+    .contacts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .contact-card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s; border-top: 4px solid var(--accent); }
+    .contact-card:hover { transform: translateY(-4px); }
+    .contact-card .icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .contact-card h3 { font-size: 1.1rem; margin-bottom: 6px; color: var(--primary-dark); }
+    .contact-card .role { font-size: 0.85rem; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+    .contact-card .desc { font-size: 0.9rem; color: var(--muted); }
+    .contact-card .phone { font-size: 1.05rem; font-weight: 600; color: var(--text); text-decoration: none; display: block; margin-top: 10px; }
+    .contact-card .phone:hover { color: var(--accent); }
+
+    /* COMMITTEE */
+    .committee-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+    .member-card { background: var(--card-bg); border-radius: var(--radius); padding: 28px 20px; text-align: center; box-shadow: var(--shadow); }
+    .member-avatar { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.6rem; font-weight: 600; }
+    .member-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .member-card .designation { font-size: 0.85rem; color: var(--accent); font-weight: 500; }
+
+    /* CONTACT SECTION */
+    .contact-section { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border-radius: var(--radius); padding: 50px 40px; text-align: center; margin-top: 20px; }
+    .contact-section h2 { font-size: 1.75rem; margin-bottom: 12px; }
+    .contact-section p { opacity: 0.9; margin-bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .contact-info { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 20px; }
+    .contact-info-item { font-size: 1rem; }
+    .contact-info-item strong { display: block; font-size: 0.85rem; opacity: 0.8; margin-bottom: 4px; }
+
+    footer { background: var(--primary-dark); color: white; text-align: center; padding: 28px 5%; font-size: 0.9rem; }
+
+    @media (max-width: 900px) {
+      .nav-links { display: none; position: absolute; top: 70px; left: 0; right: 0; background: white; flex-direction: column; padding: 20px; gap: 14px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+      .nav-links.active { display: flex; }
+      .menu-toggle { display: block; }
+      .hero h1 { font-size: 1.85rem; }
+      .hero p { font-size: 1rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      section { padding: 50px 5%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="#" class="logo">Our <span>Society</span></a>
+    <div class="nav-right">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" onclick="closeMenu()" data-en="Home" data-hi="होम">Home</a></li>
+        <li><a href="#about" onclick="closeMenu()" data-en="About" data-hi="परिचय">About</a></li>
+        <li><a href="#contacts" onclick="closeMenu()" data-en="Emergency" data-hi="आपातकाल">Emergency</a></li>
+        <li><a href="#committee" onclick="closeMenu()" data-en="Committee" data-hi="समिति">Committee</a></li>
+        <li><a href="#notices" onclick="closeMenu()" data-en="Notices" data-hi="सूचनाएँ">Notices</a></li>
+        <li><a href="#contact" onclick="closeMenu()" data-en="Contact" data-hi="संपर्क">Contact</a></li>
+      </ul>
+      <div class="lang-switch">
+        <button class="lang-btn active" id="btnEn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" id="btnHi" onclick="setLang('hi')">हिं</button>
+      </div>
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="home">
+    <h1 data-en="Welcome to Our Society" data-hi="हमारी सोसाइटी में आपका स्वागत है">Welcome to Our Society</h1>
+    <p data-en="A central place for members to get all important information about the society, emergency contacts, and latest notices." data-hi="सदस्यों के लिए एक केंद्रीय जगह जहाँ आप सोसाइटी की सभी महत्वपूर्ण जानकारी, आपातकालीन संपर्क और नवीनतम सूचनाएँ देख सकते हैं।">A central place for members to get all important information about the society, emergency contacts, and latest notices.</p>
+    <a href="#contacts" class="hero-btn" data-en="View Emergency Contacts" data-hi="आपातकालीन संपर्क देखें">View Emergency Contacts</a>
+  </header>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-title">
+      <h2 data-en="About Our Society" data-hi="हमारी सोसाइटी के बारे में">About Our Society</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <h3 data-en="About Us" data-hi="हमारे बारे में">About Us</h3>
+        <p data-en="This is a residential society where members live together and work as a community." data-hi="यह एक रेसिडेंशियल सोसाइटी है जहाँ सदस्य एक साथ रहते हैं और समुदाय के रूप में साथ मिलकर काम करते हैं।">This is a residential society where members live together and work as a community.</p>
+        <p data-en="Through this website you can find important information related to the society, emergency contacts, committee members and latest notices." data-hi="इस वेबसाइट के माध्यम से आप सोसाइटी से जुड़ी ज़रूरी जानकारी, आपातकालीन संपर्क, समिति के सदस्य और नवीनतम सूचनाएँ देख सकते हैं।">Through this website you can find important information related to the society, emergency contacts, committee members and latest notices.</p>
+      </div>
+      <div class="about-card">
+        <h3 data-en="Quick Info" data-hi="त्वरित जानकारी">Quick Info</h3>
+        <ul>
+          <li data-en="Total Flats / Houses: —" data-hi="कुल फ्लैट / मकान: —">Total Flats / Houses: —</li>
+          <li data-en="Established Year: —" data-hi="स्थापना वर्ष: —">Established Year: —</li>
+          <li data-en="Society Type: Residential" data-hi="सोसाइटी प्रकार: रेसिडेंशियल">Society Type: Residential</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- EMERGENCY CONTACTS -->
+  <section id="contacts" style="background: #f1f5f9; max-width: 100%; padding-left: 5%; padding-right: 5%;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="section-title">
+        <h2 data-en="Emergency Contacts" data-hi="आपातकालीन संपर्क">Emergency Contacts</h2>
+        <p data-en="Contact these numbers when needed" data-hi="ज़रूरत पड़ने पर इन नंबरों पर संपर्क करें">Contact these numbers when needed</p>
+      </div>
+      <div class="contacts-grid">
+        <div class="contact-card">
+          <div class="icon">🩺</div>
+          <h3>Dr. Name</h3>
+          <div class="role" data-en="Society Doctor" data-hi="सोसाइटी डॉक्टर">Society Doctor</div>
+          <p class="desc" data-en="General Physician" data-hi="जनरल फिजिशियन">General Physician</p>
+          <a href="tel:+91XXXXXXXXXX" class="phone">+91 XXXXX XXXXX</a>
+        </div>
+        <div class="contact-card">
+          <div class="icon">🛡️</div>
+          <h3 data-en="Security Gate" data-hi="सिक्योरिटी गेट">Security Gate</h3>
+          <div class="role" data-en="24×7 Available" data-hi="24×7 उपलब्ध">24×7 Available</div>
+          <p class="desc" data-en="Main Gate Security" data-hi="मेन गेट सिक्योरिटी">Main Gate Security</p>
+          <a href="tel:+91XXXXXXXXXX" class="phone">+91 XXXXX XXXXX</a>
+        </div>
+        <div class="contact-card">
+          <div class="icon">👤</div>
+          <h3 data-en="Society Admin" data-hi="सोसाइटी एडमिन">Society Admin</h3>
+          <div class="role" data-en="Secretary / Manager" data-hi="सचिव / मैनेजर">Secretary / Manager</div>
+          <p class="desc" data-en="General queries" data-hi="सामान्य पूछताछ">General queries</p>
+          <a href="tel:+91XXXXXXXXXX" class="phone">+91 XXXXX XXXXX</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMITTEE -->
+  <section id="committee">
+    <div class="section-title">
+      <h2 data-en="Committee Members" data-hi="समिति के सदस्य">Committee Members</h2>
+    </div>
+    <div class="committee-grid">
+      <div class="member-card">
+        <div class="member-avatar">P</div>
+        <h3>Name</h3>
+        <div class="designation" data-en="President" data-hi="अध्यक्ष">President</div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">S</div>
+        <h3>Name</h3>
+        <div class="designation" data-en="Secretary" data-hi="सचिव">Secretary</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTICES (TELEGRAM LIVE FEED) -->
+  <section id="notices" style="background: #f1f5f9; max-width: 100%; padding-left: 5%; padding-right: 5%;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="section-title">
+        <h2 data-en="Latest Notices" data-hi="नवीनतम सूचनाएँ">Latest Notices</h2>
+        <p data-en="Live updates directly from the Society Admin" data-hi="सोसाइटी एडमिन से सीधे लाइव अपडेट">Live updates directly from the Society Admin</p>
+      </div>
+      
+      <!-- Telegram Embed Wrapper -->
+      <div style="display: flex; justify-content: center; width: 100%;">
+        <!-- IMPORTANT: REPLACE "YOUR_CHANNEL_USERNAME" BELOW -->
+        <iframe 
+          src="https://t.me/s/Sector_XU1?embed=1" 
+          style="width: 100%; max-width: 600px; height: 500px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); background: white;"
+          title="Society Notices Telegram Feed">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-section">
+      <h2 data-en="Contact Society Admin" data-hi="सोसाइटी एडमिन से संपर्क करें">Contact Society Admin</h2>
+      <div class="contact-info">
+        <div class="contact-info-item">
+          <strong data-en="Phone" data-hi="फोन">Phone</strong>
+          +91 XXXXX XXXXX
+        </div>
+        <div class="contact-info-item">
+          <strong data-en="Email" data-hi="ईमेल">Email</strong>
+          admin@oursociety.com
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p data-en="© 2026 Our Society. All rights reserved." data-hi="© 2026 हमारी सोसाइटी. सर्वाधिकार सुरक्षित.">© 2026 Our Society. All rights reserved.</p>
+  </footer>
+
+  <script>
+    let currentLang = 'en';
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+      document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+    }
+    function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+    function closeMenu() { document.getElementById('navLinks').classList.remove('active'); }
+  </script>
+</body>
+</html>
