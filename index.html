@@ -77,7 +77,14 @@
     .member-avatar { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.6rem; font-weight: 600; }
     .member-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
     .member-card .designation { font-size: 0.85rem; color: var(--accent); font-weight: 500; }
-
+	/* HOW-TO SECTION */
+    .howto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+    .howto-card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s; }
+    .howto-card:hover { transform: translateY(-4px); }
+    .howto-card h3 { font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 8px; }
+    .howto-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 16px; }
+    .video-container { position: relative; padding-bottom: 56.25%; /* 16:9 Aspect Ratio */ height: 0; overflow: hidden; border-radius: 8px; background: #e2e8f0; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
     /* CONTACT SECTION */
     .contact-section { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border-radius: var(--radius); padding: 50px 40px; text-align: center; margin-top: 20px; }
     .contact-section h2 { font-size: 1.75rem; margin-bottom: 12px; }
@@ -111,6 +118,7 @@
         <li><a href="#contacts" onclick="closeMenu()" data-en="Emergency" data-hi="आपातकाल">Emergency</a></li>
         <li><a href="#committee" onclick="closeMenu()" data-en="Committee" data-hi="समिति">Committee</a></li>
         <li><a href="#notices" onclick="closeMenu()" data-en="Notices" data-hi="सूचनाएँ">Notices</a></li>
+		<li><a href="#howto" onclick="closeMenu()" data-en="How To" data-hi="कैसे करें">How To</a></li>
         <li><a href="#contact" onclick="closeMenu()" data-en="Contact" data-hi="संपर्क">Contact</a></li>
       </ul>
       <div class="lang-switch">
@@ -218,6 +226,47 @@
     </div>
   </section>
 
+<!-- HOW TO / HELP DESK -->
+  <section id="howto">
+    <div class="section-title">
+      <h2 data-en="Help Desk & How-To" data-hi="हेल्प डेस्क और कैसे करें">Help Desk & How-To</h2>
+      <p data-en="Step-by-step video guides for common society procedures." data-hi="सोसाइटी की सामान्य प्रक्रियाओं के लिए चरण-दर-चरण वीडियो मार्गदर्शिका।">Step-by-step video guides for common society procedures.</p>
+    </div>
+    
+    <div class="howto-grid">
+      
+      <!-- Guide 1: General Society Complaint -->
+      <div class="howto-card">
+        <h3 data-en="Raise a Society Complaint" data-hi="सोसाइटी की शिकायत कैसे दर्ज करें">Raise a Society Complaint</h3>
+        <p data-en="Learn how to officially register issues regarding maintenance, plumbing, or security." data-hi="मेंटेनेंस, प्लंबिंग या सुरक्षा से जुड़ी समस्याओं को आधिकारिक तौर पर दर्ज करना सीखें।">Learn how to officially register issues regarding maintenance, plumbing, or security.</p>
+        <div class="video-container">
+          <!-- Replace the src URL below with your actual YouTube embed link -->
+          <iframe src="https://www.youtube.com/embed/ScMzIvxBSi4" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <!-- Guide 2: Water Bill -->
+      <div class="howto-card">
+        <h3 data-en="View & Pay Water Bill" data-hi="पानी का बिल कैसे देखें और भरें">View & Pay Water Bill</h3>
+        <p data-en="Step-by-step guide to checking your monthly water consumption and making an online payment." data-hi="अपने मासिक पानी की खपत की जांच करने और ऑनलाइन भुगतान करने के लिए चरण-दर-चरण मार्गदर्शिका।">Step-by-step guide to checking your monthly water consumption and making an online payment.</p>
+        <div class="video-container">
+          <!-- Replace the src URL below with your actual YouTube embed link -->
+          <iframe src="https://www.youtube.com/embed/ScMzIvxBSi4" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <!-- Guide 3: NPCL Electricity -->
+      <div class="howto-card">
+        <h3 data-en="Report NPCL Electricity Issues" data-hi="NPCL बिजली की समस्या कैसे दर्ज करें">Report NPCL Electricity Issues</h3>
+        <p data-en="How to use the NPCL portal or app to report power outages, meter faults, or billing errors." data-hi="बिजली कटौती, मीटर में खराबी या बिलिंग त्रुटियों की रिपोर्ट करने के लिए NPCL पोर्टल या ऐप का उपयोग कैसे करें।">How to use the NPCL portal or app to report power outages, meter faults, or billing errors.</p>
+        <div class="video-container">
+          <!-- Replace the src URL below with your actual YouTube embed link -->
+          <iframe src="https://www.youtube.com/embed/ScMzIvxBSi4" allowfullscreen></iframe>
+        </div>
+      </div>
+
+    </div>
+  </section>
   <!-- CONTACT -->
   <section id="contact">
     <div class="contact-section">
