@@ -267,12 +267,11 @@
       try {
         let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
           headers: { 'X-Access-Key': API_KEY },
-          cache: 'no-store' // This forces the browser to get fresh data!
+          cache: 'no-store' 
         });
         
         let data = await response.json();
         
-        // Check if JSONBin returned an error message
         if (data.message) {
             container.innerHTML = `<div style="text-align: center; color: red;">Database Error: ${data.message}</div>`;
             return;
@@ -287,12 +286,19 @@
 
         let htmlContent = '';
         notices.forEach(notice => {
+          
+          // Generate the author badge if author data exists
+          let authorHtml = notice.author 
+            ? `<div style="margin-top: 10px; font-size: 0.85rem; color: #159895; font-weight: 600;">Posted by: ${notice.author}</div>` 
+            : '';
+
           htmlContent += `
             <div class="notice-item" style="background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); display: flex; gap: 18px; align-items: flex-start; border-left: 5px solid #159895; margin-bottom: 16px;">
               <div class="notice-date" style="background: #e0f2f1; color: #1a5f7a; font-size: 0.8rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; white-space: nowrap;">${notice.date}</div>
-              <div class="notice-content">
+              <div class="notice-content" style="width: 100%;">
                 <h4 style="font-size: 1.05rem; margin-bottom: 4px;">${notice.title}</h4>
-                <p style="color: #64748b; font-size: 0.95rem;">${notice.desc}</p>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 0;">${notice.desc}</p>
+                ${authorHtml}
               </div>
             </div>
           `;
@@ -306,7 +312,6 @@
       }
     }
 
-    // Load notices as soon as the page opens
     window.onload = loadNotices;
   </script>
   
