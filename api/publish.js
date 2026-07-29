@@ -1,37 +1,28 @@
-// api/publish.js
-
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { password, title, desc } = req.body;
 
-  // 1. SECURE PASSWORD CHECK (Hidden from the public)
+  // Passwords mapped to Display Names
   const adminAccounts = {
     'admin123': 'Society Admin',
     'president123': 'President',
     'secretary123': 'Secretary'
   };
 
-  const author = adminAccounts[password];
+  // Assign author based on password, or default to "Society Admin"
+  const author = adminAccounts[password] || 'Society Admin';
 
-  if (!author) {
-    return res.status(401).json({ error: 'Incorrect Password' });
-  }
-
-  // 2. SECURE DATABASE CONFIGURATION
   const BIN_ID = '6a69a6d3da38895dfe9ea9ce';
-  const API_KEY = process.env.JSONBIN_MASTER_KEY; // Pulled secretly from Vercel settings
+  const API_KEY = process.env.JSONBIN_MASTER_KEY;
 
-  // 3. AUTO-GENERATE DATE
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const today = new Date();
   const autoDate = today.getDate() + ' ' + months[today.getMonth()] + ' ' + today.getFullYear();
 
   try {
-    // 4. FETCH CURRENT NOTICES
     let getResponse = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
       headers: { 'X-Master-Key': API_KEY }
     });
@@ -40,10 +31,9 @@ export default async function handler(req, res) {
     
     if (!Array.isArray(notices)) notices = [];
 
-    // 5. ADD NEW NOTICE
+    // Save notice WITH the author tag
     notices.unshift({ date: autoDate, title: title, desc: desc, author: author });
 
-    // 6. SAVE BACK TO DATABASE
     await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
       method: 'PUT',
       headers: {
