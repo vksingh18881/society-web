@@ -266,7 +266,7 @@
       
       try {
         let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-          headers: { 'X-Master-Key': API_KEY },
+          headers: { 'X-Access-Key': API_KEY },
           cache: 'no-store' // This forces the browser to get fresh data!
         });
         
