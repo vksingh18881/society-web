@@ -264,8 +264,9 @@
       const container = document.getElementById('dynamic-notices');
       try {
         let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-          headers: { 'X-Master-Key': API_KEY }
-        });
+  headers: { 'X-Master-Key': API_KEY },
+  cache: 'no-store' 
+});
         let data = await response.json();
         let notices = data.record;
 
