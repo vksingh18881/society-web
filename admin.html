@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Society Admin Panel</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; color: #1e293b; display: flex; justify-content: center; padding: 50px 20px; }
+    .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 500px; }
+    h2 { color: #1a5f7a; margin-bottom: 20px; text-align: center; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+    button { width: 100%; padding: 12px; background: #159895; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #117b79; }
+    #login-section, #admin-section { display: none; }
+    .active { display: block !important; }
+    .status { text-align: center; margin-top: 15px; font-weight: bold; color: #159895; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Login Screen -->
+    <div id="login-section" class="active">
+      <h2>Admin Login</h2>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter admin password">
+      </div>
+      <button onclick="checkPassword()">Login</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-section">
+      <h2>Post a New Notice</h2>
+      <div class="form-group">
+        <label>Date (e.g., 29 Jul 2026)</label>
+        <input type="text" id="notice-date" placeholder="DD MMM YYYY">
+      </div>
+      <div class="form-group">
+        <label>Notice Title</label>
+        <input type="text" id="notice-title" placeholder="e.g., Water Supply Update">
+      </div>
+      <div class="form-group">
+        <label>Notice Details</label>
+        <textarea id="notice-desc" rows="4" placeholder="Write the full message here..."></textarea>
+      </div>
+      <button onclick="publishNotice()" id="publish-btn">Publish Notice to Website</button>
+      <div id="status-msg" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- DATABASE CONFIGURATION ---
+    const BIN_ID = '6a69a6d3da38895dfe9ea9ce';
+    const API_KEY = '$2a$10$MKl0DnymFaGtWD0xxaaQ6eNUzXf1WABsqk7iG5TRCR3cnk3/c4u1q';
+    // ------------------------------
+
+    // Simple password protection (Password is: admin123)
+    function checkPassword() {
+      const pass = document.getElementById('password').value;
+      if(pass === 'admin123') {
+        document.getElementById('login-section').classList.remove('active');
+        document.getElementById('admin-section').classList.add('active');
+      } else {
+        alert("Incorrect Password!");
+      }
+    }
+
+    async function publishNotice() {
+      const date = document.getElementById('notice-date').value;
+      const title = document.getElementById('notice-title').value;
+      const desc = document.getElementById('notice-desc').value;
+      const btn = document.getElementById('publish-btn');
+      const status = document.getElementById('status-msg');
+
+      if(!date || !title || !desc) {
+        alert("Please fill in all fields!"); return;
+      }
+
+      btn.innerText = "Publishing...";
+      
+      try {
+        // 1. Get current notices from database
+        let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { 'X-Master-Key': API_KEY }
+        });
+        let data = await response.json();
+        let notices = data.record;
+        
+        if(!Array.isArray(notices)) notices = [];
+
+        // 2. Add the new notice to the top of the list
+        notices.unshift({ date: date, title: title, desc: desc });
+
+        // 3. Save the updated list back to the database
+        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': API_KEY
+          },
+          body: JSON.stringify(notices)
+        });
+
+        status.innerText = "Notice Published Successfully!";
+        btn.innerText = "Publish Notice to Website";
+        
+        // Clear form
+        document.getElementById('notice-date').value = '';
+        document.getElementById('notice-title').value = '';
+        document.getElementById('notice-desc').value = '';
+        
+        setTimeout(() => status.innerText = '', 3000);
+
+      } catch (error) {
+        alert("Error publishing notice. Check console.");
+        console.error(error);
+        btn.innerText = "Publish Notice to Website";
+      }
+    }
+  </script>
+</body>
+</html>
