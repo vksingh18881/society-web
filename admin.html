@@ -6,16 +6,23 @@
   <title>Society Admin Panel</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; color: #1e293b; display: flex; justify-content: center; padding: 50px 20px; }
-    .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 500px; }
+    .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 600px; }
     h2 { color: #1a5f7a; margin-bottom: 20px; text-align: center; }
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
     button { width: 100%; padding: 12px; background: #159895; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
     button:hover { background: #117b79; }
+    .delete-btn { background: #ef4444; padding: 8px; font-size: 0.85rem; margin-top: 10px; }
+    .delete-btn:hover { background: #dc2626; }
     #login-section, #admin-section { display: none; }
     .active { display: block !important; }
     .status { text-align: center; margin-top: 15px; font-weight: bold; color: #159895; }
+    
+    .notice-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #1a5f7a; }
+    .notice-card h4 { margin: 0 0 5px 0; }
+    .notice-card p { margin: 0; font-size: 0.85rem; color: #64748b; }
+    hr { border: 0; height: 1px; background: #e2e8f0; margin: 30px 0; }
   </style>
 </head>
 <body>
@@ -42,63 +49,136 @@
         <label>Notice Details</label>
         <textarea id="notice-desc" rows="4" placeholder="Write the full message here..."></textarea>
       </div>
+      <div class="form-group">
+        <label>Auto-Remove Notice After:</label>
+        <select id="notice-duration">
+          <option value="never">Never (Keep Forever)</option>
+          <option value="daily">24 Hours</option>
+          <option value="weekly">7 Days</option>
+          <option value="monthly">30 Days</option>
+        </select>
+      </div>
       
-      <button onclick="publishNotice()" id="publish-btn">Publish Notice to Website</button>
+      <button onclick="publishNotice()" id="publish-btn">Publish Notice</button>
       <div id="status-msg" class="status"></div>
+
+      <hr>
+
+      <h2>Manage Active Notices</h2>
+      <button onclick="loadManageNotices()" style="background: #64748b; margin-bottom: 15px;">Refresh List</button>
+      <div id="manage-list">
+        <!-- Existing notices will load here -->
+      </div>
     </div>
   </div>
 
   <script>
-    // Just switches the screen - actual security check happens on the server now
+    const BIN_ID = '6a69a6d3da38895dfe9ea9ce'; 
+    const READ_API_KEY = 'PASTE_YOUR_READ_ONLY_ACCESS_KEY_HERE'; // MUST PASTE THIS TO VIEW NOTICES
+
     function showAdminPanel() {
       const pass = document.getElementById('password').value;
-      if (!pass) {
-        alert("Please enter a password");
-        return;
-      }
+      if (!pass) { alert("Please enter a password"); return; }
       document.getElementById('login-section').classList.remove('active');
       document.getElementById('admin-section').classList.add('active');
+      loadManageNotices();
     }
 
+    // --- PUBLISH NOTICE ---
     async function publishNotice() {
       const password = document.getElementById('password').value;
       const title = document.getElementById('notice-title').value;
       const desc = document.getElementById('notice-desc').value;
+      const duration = document.getElementById('notice-duration').value;
       const btn = document.getElementById('publish-btn');
       const status = document.getElementById('status-msg');
 
-      if(!title || !desc) {
-        alert("Please fill in the title and details!"); return;
-      }
+      if(!title || !desc) { alert("Please fill in the title and details!"); return; }
 
       btn.innerText = "Publishing...";
       
       try {
-        // Send the data to our secure Vercel backend
         let response = await fetch('/api/publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, title, desc })
+          body: JSON.stringify({ password, action: 'publish', title, desc, duration })
         });
         
         let result = await response.json();
+        if (!response.ok) throw new Error(result.error);
 
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to publish");
-        }
-
-        status.innerText = "Notice Published Successfully!";
-        btn.innerText = "Publish Notice to Website";
-        
-        // Clear form
+        status.innerText = "Notice Published!";
+        btn.innerText = "Publish Notice";
         document.getElementById('notice-title').value = '';
         document.getElementById('notice-desc').value = '';
-        
         setTimeout(() => status.innerText = '', 3000);
+        
+        loadManageNotices(); // Refresh the list below
 
       } catch (error) {
         alert(error.message);
-        btn.innerText = "Publish Notice to Website";
+        btn.innerText = "Publish Notice";
+      }
+    }
+
+    // --- LOAD NOTICES FOR DELETION ---
+    async function loadManageNotices() {
+      const list = document.getElementById('manage-list');
+      list.innerHTML = 'Loading...';
+      try {
+        let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { 'X-Access-Key': READ_API_KEY }, cache: 'no-store' 
+        });
+        let data = await response.json();
+        let notices = data.record;
+
+        if (!notices || notices.length === 0) { list.innerHTML = 'No notices found.'; return; }
+
+        let html = '';
+        const currentTime = Date.now();
+
+        notices.forEach(notice => {
+          // Identify if it's already expired
+          let isExpired = notice.expiry && notice.expiry < currentTime;
+          let statusText = isExpired ? '<span style="color:red">(Expired - Hidden from public)</span>' : '';
+
+          html += `
+            <div class="notice-card" id="card-${notice.id}">
+              <h4>${notice.title} ${statusText}</h4>
+              <p>${notice.date} | ${notice.author || 'Admin'}</p>
+              <button class="delete-btn" onclick="deleteNotice('${notice.id}')">Delete Post</button>
+            </div>
+          `;
+        });
+        list.innerHTML = html;
+      } catch (error) {
+        list.innerHTML = 'Error loading notices.';
+      }
+    }
+
+    // --- DELETE NOTICE ---
+    async function deleteNotice(noticeId) {
+      if(!confirm("Are you sure you want to permanently delete this notice?")) return;
+      
+      const password = document.getElementById('password').value;
+      const card = document.getElementById(`card-${noticeId}`);
+      card.style.opacity = '0.5'; // Visual feedback
+
+      try {
+        let response = await fetch('/api/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, action: 'delete', noticeId })
+        });
+        
+        let result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+
+        loadManageNotices(); // Refresh the list to confirm removal
+
+      } catch (error) {
+        alert("Failed to delete: " + error.message);
+        card.style.opacity = '1';
       }
     }
   </script>

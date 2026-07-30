@@ -342,23 +342,11 @@
   </script>
 
   <script>
-    let currentLang = 'en';
-    function setLang(lang) {
-      currentLang = lang;
-      document.getElementById('btnEn').classList.toggle('active', lang === 'en');
-      document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
-      document.documentElement.lang = lang;
-      document.querySelectorAll('[data-en]').forEach(el => {
-        el.textContent = el.getAttribute('data-' + lang);
-      });
-    }
-    function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
-    function closeMenu() { document.getElementById('navLinks').classList.remove('active'); }
-  </script>
- <script>
     // --- DATABASE CONFIGURATION ---
-    // I moved your actual Bin ID up here where it belongs!
     const BIN_ID = '6a69a6d3da38895dfe9ea9ce'; 
+    
+    // ⚠️ SECURITY FIX: Paste your READ-ONLY Access Key here. 
+    // DO NOT use your Master Key in this public file!
     const API_KEY = '$2a$10$N/eXqkTNVfWzUQ6lPmjuHOI3M8/pK3NcroN/YiTtfnXfEYWAZaHz2'; 
     // ------------------------------
 
@@ -380,9 +368,10 @@
             return;
         }
 
-        allNotices = data.record;
+        // Safely check if records exist
+        allNotices = Array.isArray(data.record) ? data.record : [];
 
-        if (!allNotices || allNotices.length === 0) {
+        if (allNotices.length === 0) {
           container.innerHTML = `<div style="text-align: center; color: #64748b;">No new notices at this time.</div>`;
           return;
         }
@@ -400,8 +389,18 @@
       const container = document.getElementById('dynamic-notices');
       let htmlContent = '';
       
+      const currentTime = Date.now();
+      
+      // NEW LOGIC: Filter out expired notices first
+      let validNotices = allNotices.filter(notice => !notice.expiry || notice.expiry > currentTime);
+      
+      if (validNotices.length === 0) {
+          container.innerHTML = `<div style="text-align: center; color: #64748b;">No active notices at this time.</div>`;
+          return;
+      }
+
       // Cut the list down to the limit (e.g., first 5)
-      let visibleNotices = allNotices.slice(0, limit);
+      let visibleNotices = validNotices.slice(0, limit);
 
       visibleNotices.forEach(notice => {
         let authorHtml = notice.author 
@@ -420,17 +419,17 @@
         `;
       });
       
-      // If there are more notices hidden, show the "View Archived Notices" button
-      if (allNotices.length > limit) {
+      // If there are more valid notices hidden, show the "View Archived Notices" button
+      if (validNotices.length > limit) {
          htmlContent += `
           <div style="text-align: center; margin-top: 24px;">
-            <button onclick="renderNotices(allNotices.length)" style="background: transparent; color: #1a5f7a; border: 2px solid #1a5f7a; padding: 10px 24px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+            <button onclick="renderNotices(validNotices.length)" style="background: transparent; color: #1a5f7a; border: 2px solid #1a5f7a; padding: 10px 24px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">
               View Archived Notices
             </button>
           </div>
          `;
       } 
-      // If all notices are showing, provide a button to collapse back to 5
+      // If all valid notices are showing, provide a button to collapse back to 5
       else if (limit > 5) {
          htmlContent += `
           <div style="text-align: center; margin-top: 24px;">
