@@ -121,7 +121,7 @@
       }
     }
 
-    // --- LOAD NOTICES FOR DELETION ---
+// --- LOAD NOTICES FOR DELETION ---
     async function loadManageNotices() {
       const list = document.getElementById('manage-list');
       list.innerHTML = 'Loading...';
@@ -138,15 +138,18 @@
         const currentTime = Date.now();
 
         notices.forEach(notice => {
-          // Identify if it's already expired
           let isExpired = notice.expiry && notice.expiry < currentTime;
           let statusText = isExpired ? '<span style="color:red">(Expired - Hidden from public)</span>' : '';
 
+          // Fallback for old notices that don't have an ID
+          let safeId = notice.id || 'undefined';
+          let safeTitle = notice.title.replace(/'/g, "\\'"); // Prevent code breaks from apostrophes
+
           html += `
-            <div class="notice-card" id="card-${notice.id}">
+            <div class="notice-card" id="card-${safeId}">
               <h4>${notice.title} ${statusText}</h4>
               <p>${notice.date} | ${notice.author || 'Admin'}</p>
-              <button class="delete-btn" onclick="deleteNotice('${notice.id}')">Delete Post</button>
+              <button class="delete-btn" onclick="deleteNotice('${safeId}', '${safeTitle}')">Delete Post</button>
             </div>
           `;
         });
@@ -157,28 +160,29 @@
     }
 
     // --- DELETE NOTICE ---
-    async function deleteNotice(noticeId) {
+    async function deleteNotice(noticeId, noticeTitle) {
       if(!confirm("Are you sure you want to permanently delete this notice?")) return;
       
       const password = document.getElementById('password').value;
       const card = document.getElementById(`card-${noticeId}`);
-      card.style.opacity = '0.5'; // Visual feedback
+      if (card) card.style.opacity = '0.5';
 
       try {
         let response = await fetch('/api/publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, action: 'delete', noticeId })
+          // We now send the title alongside the ID so the backend can use the fallback
+          body: JSON.stringify({ password, action: 'delete', noticeId, title: noticeTitle })
         });
         
         let result = await response.json();
         if (!response.ok) throw new Error(result.error);
 
-        loadManageNotices(); // Refresh the list to confirm removal
+        loadManageNotices(); // Refresh list
 
       } catch (error) {
         alert("Failed to delete: " + error.message);
-        card.style.opacity = '1';
+        if (card) card.style.opacity = '1';
       }
     }
   </script>
