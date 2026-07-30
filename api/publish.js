@@ -3,7 +3,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // We now accept 'action', 'duration', and 'noticeId'
   const { password, action, title, desc, duration, noticeId } = req.body;
 
   const adminAccounts = {
@@ -28,23 +27,27 @@ export default async function handler(req, res) {
     let notices = Array.isArray(data.record) ? data.record : [];
 
     if (action === 'delete') {
-      // Filter out the notice that matches the ID
-      notices = notices.filter(n => n.id !== noticeId);
+      // NEW LOGIC: Delete by ID for new notices, or fallback to Title for old legacy notices
+      notices = notices.filter(n => {
+        if (noticeId && noticeId !== 'undefined') {
+          return n.id !== noticeId;
+        } else {
+          return n.title !== title;
+        }
+      });
     } else {
       // Publish Action
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const today = new Date();
       const autoDate = today.getDate() + ' ' + months[today.getMonth()] + ' ' + today.getFullYear();
       
-      // Calculate Auto-Disappear Expiry Time (in milliseconds)
-      let expiryTime = null; // 'never'
+      let expiryTime = null; 
       if (duration === 'daily') expiryTime = Date.now() + (24 * 60 * 60 * 1000);
       else if (duration === 'weekly') expiryTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
       else if (duration === 'monthly') expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000);
 
-      // Create notice with a Unique ID and Expiry
       const newNotice = {
-        id: Date.now().toString(), // Unique timestamp ID
+        id: Date.now().toString(),
         date: autoDate, 
         title: title, 
         desc: desc, 
