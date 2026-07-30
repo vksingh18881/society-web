@@ -284,20 +284,62 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
+ 
   <footer>
-    <!-- FOOTER -->
+   <!-- FOOTER -->
   <footer style="background: var(--primary-dark); color: white; text-align: center; padding: 30px 5%; font-size: 0.9rem;">
     <p data-en="© 2026 Our Society. All rights reserved." data-hi="© 2026 हमारी सोसाइटी. सर्वाधिकार सुरक्षित.">© 2026 Our Society. All rights reserved.</p>
     
-    <!-- VISITOR COUNTER -->
-    <div style="margin-top: 15px;">
-      <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 5px;" data-en="Total Page Views" data-hi="कुल पृष्ठ दृश्य">Total Page Views</p>
-      <!-- The image badge that automatically counts visitors -->
-      <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fsociety-web-ivory.vercel.app&count_bg=%23159895&title_bg=%231a5f7a&icon=&icon_color=%23E7E7E7&title=Visits&edge_flat=true" alt="Visitor Counter" style="border-radius: 4px;">
+    <!-- VISITOR COUNTERS -->
+    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+      
+      <!-- Daily Counter -->
+      <div style="background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-width: 120px;">
+        <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 4px;" data-en="Today's Visitors" data-hi="आज के दर्शक">Today's Visitors</p>
+        <div id="daily-counter" style="font-size: 1.3rem; font-weight: 700; color: #159895;">...</div>
+      </div>
+
+      <!-- Total Counter -->
+      <div style="background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-width: 120px;">
+        <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 4px;" data-en="Total Visitors" data-hi="कुल दर्शक">Total Visitors</p>
+        <div id="total-counter" style="font-size: 1.3rem; font-weight: 700; color: #159895;">...</div>
+      </div>
+
     </div>
   </footer>
-
+<script>
+    async function updateCounters() {
+      // 1. Generate today's date formatted to local time (resets at midnight)
+      const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+      
+      // 2. Setup the two unique API addresses
+      const dailyUrl = `https://api.counterapi.dev/v1/society-portal/visits-${today}/up`;
+      const totalUrl = `https://api.counterapi.dev/v1/society-portal/visits-total/up`;
+      
+      try {
+        // 3. Request both counts at the exact same time
+        const [dailyRes, totalRes] = await Promise.all([
+          fetch(dailyUrl),
+          fetch(totalUrl)
+        ]);
+        
+        // 4. Read the data
+        const dailyData = await dailyRes.json();
+        const totalData = await totalRes.json();
+        
+        // 5. Update the webpage
+        document.getElementById('daily-counter').innerText = dailyData.count;
+        document.getElementById('total-counter').innerText = totalData.count;
+      } catch (error) {
+        document.getElementById('daily-counter').innerText = "-";
+        document.getElementById('total-counter').innerText = "-";
+        console.error("Counters failed to load");
+      }
+    }
+    
+    // Run the script as soon as the page loads
+    updateCounters();
+  </script>
 
   <script>
     let currentLang = 'en';
