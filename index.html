@@ -515,6 +515,27 @@
 
     window.onload = loadNotices;
   </script>
-  
+  <script>
+    // --- LANGUAGE & MOBILE MENU CONTROLS ---
+    let currentLang = 'en';
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+      document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+    }
+
+    function toggleMenu() {
+      document.getElementById('navLinks').classList.toggle('active');
+    }
+    function closeMenu() {
+      document.getElementById('navLinks').classList.remove('active');
+    }
+  </script>
 </body>
 </html>
