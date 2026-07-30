@@ -309,31 +309,31 @@
   </footer>
 <script>
     async function updateCounters() {
-      // 1. Generate today's date formatted to local time (resets at midnight)
+      // 1. Generate today's date formatted to local time
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
       
-      // 2. Setup the two unique API addresses
-      const dailyUrl = `https://api.counterapi.dev/v1/society-portal/visits-${today}/up`;
-      const totalUrl = `https://api.counterapi.dev/v1/society-portal/visits-total/up`;
+      // 2. We use hidden, random-looking IDs instead of the word "visits" to bypass Firefox adblockers
+      const dailyUrl = `https://api.counterapi.dev/v1/society-app/day-${today}/up`;
+      const totalUrl = `https://api.counterapi.dev/v1/society-app/t-all/up`;
       
+      // 3. Fetch Daily Counter independently
       try {
-        // 3. Request both counts at the exact same time
-        const [dailyRes, totalRes] = await Promise.all([
-          fetch(dailyUrl),
-          fetch(totalUrl)
-        ]);
-        
-        // 4. Read the data
-        const dailyData = await dailyRes.json();
-        const totalData = await totalRes.json();
-        
-        // 5. Update the webpage
+        let dailyRes = await fetch(dailyUrl);
+        let dailyData = await dailyRes.json();
         document.getElementById('daily-counter').innerText = dailyData.count;
+      } catch (error) {
+        document.getElementById('daily-counter').innerText = "0";
+        console.error("Daily counter blocked:", error);
+      }
+
+      // 4. Fetch Total Counter independently
+      try {
+        let totalRes = await fetch(totalUrl);
+        let totalData = await totalRes.json();
         document.getElementById('total-counter').innerText = totalData.count;
       } catch (error) {
-        document.getElementById('daily-counter').innerText = "-";
-        document.getElementById('total-counter').innerText = "-";
-        console.error("Counters failed to load");
+        document.getElementById('total-counter').innerText = "0";
+        console.error("Total counter blocked:", error);
       }
     }
     
